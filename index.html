@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InspoBot | Premium AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #8b5cf6; --accent: #d946ef; --bg: #030712; }
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: white; overflow: hidden; }
+        
+        /* Premium Background */
+        .bg-gradient { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
+            background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #030712 100%); }
+
+        /* Hero Section */
+        .hero { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.8s ease; }
+        .hero h1 { font-size: 4rem; font-weight: 600; margin-bottom: 0; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { color: #9ca3af; font-size: 1.2rem; margin-bottom: 30px; }
+
+        .cta-btn { background: white; color: black; border: none; padding: 18px 45px; font-size: 1.1rem; font-weight: 600; border-radius: 100px; cursor: pointer; transition: 0.3s; }
+        .cta-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(139, 92, 246, 0.4); }
+
+        /* Glassmorphism Chat Widget */
+        #chat-widget { position: fixed; bottom: -800px; right: 40px; width: 420px; height: 600px; 
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 24px; display: flex; flex-direction: column; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
+        #chat-widget.active { bottom: 40px; }
+
+        #chat-header { padding: 25px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-weight: 600; display: flex; justify-content: space-between; }
+        #chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+
+        .msg { padding: 14px 18px; border-radius: 18px; font-size: 0.95rem; line-height: 1.5; max-width: 85%; animation: fadeIn 0.3s ease; }
+        .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .bot { background: rgba(255, 255, 255, 0.1); align-self: flex-start; border-bottom-left-radius: 4px; }
+
+        .input-wrapper { padding: 20px; background: rgba(0,0,0,0.2); }
+        input { width: 90%; background: transparent; border: none; color: white; padding: 10px; font-size: 1rem; outline: none; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <div class="hero" id="hero">
+        <h1>InspoBot</h1>
+        <p>AI-Powered Wisdom on Demand</p>
+        <button class="cta-btn" onclick="toggleChat()">Need a Quote?</button>
+    </div>
+
+    <div id="chat-widget">
+        <div id="chat-header">
+            <span>✨ AI Assistant</span>
+            <span style="cursor:pointer" onclick="toggleChat()">✕</span>
+        </div>
+        <div id="chat-messages">
+            <div class="msg bot">Hello Harsh! How can I inspire you today?</div>
+        </div>
+        <div class="input-wrapper">
+            <input type="text" id="user-input" placeholder="Type your mood..." onkeypress="if(event.key==='Enter')send()">
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const widget = document.getElementById('chat-widget');
+            const hero = document.getElementById('hero');
+            widget.classList.toggle('active');
+            hero.style.filter = widget.classList.contains('active') ? 'blur(10px)' : 'none';
+        }
+
+        async function send() {
+            const input = document.getElementById('user-input');
+            const box = document.getElementById('chat-messages');
+            if(!input.value) return;
+
+            const text = input.value;
+            box.innerHTML += `<div class="msg user">${text}</div>`;
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            try {
+                const res = await fetch('http://localhost:5005/webhooks/rest/webhook', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({sender: "harsh_dev", message: text})
+                });
+                const data = await res.json();
+                data.forEach(m => {
+                    box.innerHTML += `<div class="msg bot">${m.text}</div>`;
+                });
+                box.scrollTop = box.scrollHeight;
+            } catch(e) {
+                box.innerHTML += `<div class="msg bot">Brain is offline. Check VS Code terminal!</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
