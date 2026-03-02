@@ -1,0 +1,18 @@
+version: "3.1"
+nlu:
+- intent: ask_motivation
+  examples: |
+    - I feel like giving up
+    - I need some inspiration
+    - I am feeling low
+    - give me a motivational quote
+    - everything is going wrong
+    - I have no energy to work
+- intent: ask_success
+  examples: |
+    - how to be successful?
+    - give me a quote about success
+    - hustle quotes
+    - I want to achieve my goals
+    - success tips
+    - how do winners think?

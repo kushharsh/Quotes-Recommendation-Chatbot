@@ -1,0 +1,11 @@
+version: "3.1"
+rules:
+- rule: Respond to motivation request
+  steps:
+  - intent: ask_motivation
+  - action: utter_motivation
+
+- rule: Respond to success request
+  steps:
+  - intent: ask_success
+  - action: utter_success

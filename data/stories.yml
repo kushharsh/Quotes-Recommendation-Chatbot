@@ -1,0 +1,11 @@
+version: "3.1"
+stories:
+- story: motivation path
+  steps:
+  - intent: ask_motivation
+  - action: utter_motivation
+
+- story: success path
+  steps:
+  - intent: ask_success
+  - action: utter_success
